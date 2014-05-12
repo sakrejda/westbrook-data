@@ -1,6 +1,12 @@
+library(RPostgreSQL)
+library(lubridate)
+
 source('~/data_management/generic/data_cleaning_functions.R')
 options(stringsAsFactors=FALSE)
 options(check.names=FALSE)
+options(mc.cores=6)
+
+pgsql <- readRDS("~/credentials/pgsql-pass-salmonids-local-db.rds")
 
 root_data_dir <- '~/data_store/westbrook'
 original_data_dir <- file.path(root_data_dir,'original_data')

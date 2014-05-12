@@ -1,0 +1,22 @@
+columns <- list(
+	who = c('tag'),
+	when = c('earliest_detection_date_time'),
+	where = c('river','area','section','distance_upriver_m','distance_upriver_from_confluence'),
+	how = c('sample_name','survey')
+)
+
+select_stmt <- paste(
+		"SELECT", paste(unlist(columns), collapse=', '), 
+		"FROM", "tags_antenna"
+	)
+
+if (getOption('verbose',FALSE)) print(queries)
+
+dbSendQuery(conn, "DROP TABLE tags_detected;")
+create_query <- paste0(
+	"CREATE TABLE tags_detected AS ",
+	"(", select_stmt, ");"
+)
+dbSendQuery(conn, create_query)
+
+

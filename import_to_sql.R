@@ -17,12 +17,15 @@ for ( name in tag_data_names) {
 				value_map[[nom]][['input']], value_map[[nom]][['output']])
 		}
 	}
+	## It's all character format up through here!
 	write.csv(x=data, file=file.path(processed_data_dir,paste0(name,'.csv')), row.names=FALSE)
+	dbWriteTable(conn=conn, name=name, value=data,row.names=FALSE,
+							 overwrite=TRUE, append=FALSE)
+
+
 	types_list[[name]] <- sapply(data, class)
 	names(types_list[[name]]) <- names(data)
-
 	
-
 	# Inspection code:
 	#	for ( nom in names(data)) { 
 	#		print(paste0("::::::",name, "$",nom,":")); 
