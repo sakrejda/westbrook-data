@@ -1,11 +1,11 @@
 stmt <- paste0(
-	"SELECT distinct(sample_name) FROM tags_electrofishing;"
+	"SELECT distinct(sample_name) FROM tags_recaptures;"
 )
 sampling <- dbGetQuery(conn, stmt)
 sampling[['order']] <- as.numeric(sampling$sample_name)
 
-sampling[['start_date']] <- parse_date_time(NA, orders='mdyhms')
-sampling[['end_date']] <- parse_date_time(NA, orders='mdyhms')
+sampling[['start_date']] <- suppressWarnings(parse_date_time(NA, orders='mdyhms'))
+sampling[['end_date']] <- suppressWarnings(parse_date_time(NA, orders='mdyhms'))
 
 sampling[['seasonal']] <- FALSE
 sampling[['seasonal']][sampling[['sample_name']] %in%  
@@ -26,13 +26,14 @@ sampling[['seasonal']][sampling[['sample_name']] %in%
 
 for (i in 1:nrow(sampling)) {
 	stmt <- paste0(
-		"SELECT distinct(date) FROM tags_electrofishing ",
+		"SELECT distinct(date) FROM tags_recaptures ",
 		"WHERE sample_name = '", sampling[i,'sample_name'], "';"
 	)
 	### FUCKING DATE PARSING!
 	date <- strsplit(x=dbGetQuery(conn,stmt)[['date']],"/")
 	detection_date <- parse_date_time(x=date, orders='mdyhms') 
-	detection_date[detection_date > now()] <- detection_date - years(100)
+	detection_date[detection_date > now()] <- 
+		detection_date[detection_date > now()] - years(100)
 	sampling[i,'start_date'] <- min(detection_date, na.rm=TRUE)
 	sampling[i,'end_date'] <- max(detection_date, na.rm=TRUE)
 	if (getOption('verbose',FALSE)) print(sampling[i,])
@@ -135,6 +136,64 @@ for ( i in 1:nrow(sampling)) {
 		sampling[i,'season'] <- season_map[[idx]]
 	}
 }
+
+dbWriteTable(conn=conn_write, name='data_sampling',value=sampling,
+						 overwrite=TRUE, row.names=FALSE)
+
+## Embarassed to write code like this:  <3 !
+sample_name_to_sample_number <- function(sample_name) {
+	return(sample_number_map[sample_name])
+}
+assign(x='sample_number_map', value=unlist(sample_number_map),
+			 envir=environment(sample_name_to_sample_number))
+## End terrible... <3
+
+## Sampling starts when it starts due to smolt sampling, so it's not
+## a year divided into clear quarters!
+sn <- sampling[sampling[['seasonal']],]
+sn <- sn[order(sn$start_date),]
+sn <- aggregate(x=sn$start_julian_day, by=sn['season'], quantile, probs=0.5)
+days_of_year_set <- 1:366
+breaks <- sn$x
+intervals <- list(
+	spring = days_of_year_set[
+		days_of_year_set >= breaks[1] & days_of_year_set < breaks[2]],
+	summer = days_of_year_set[
+		days_of_year_set >= breaks[2] & days_of_year_set < breaks[3]],
+	autumn = days_of_year_set[
+		days_of_year_set >= breaks[3] & days_of_year_set < breaks[4]],
+	winter = days_of_year_set[
+		days_of_year_set < breaks[1] | days_of_year_set >= breaks[4]]
+)
+for (i in names(intervals)) {
+	intervals[[i]] <- data.frame(intervals[[i]],i)
+	names(intervals[[i]]) <- c('day','season_name')
+}
+intervals <- do.call(what=rbind, args=intervals)
+season_map <- intervals[order(intervals[['day']]),]
+season_map[['season_number']] <- rep(NA,nrow(season_map))
+season_map[season_map[['season_name']] == 'spring','season_number'] <-1
+season_map[season_map[['season_name']] == 'summer','season_number'] <-2
+season_map[season_map[['season_name']] == 'autumn','season_number'] <-3
+season_map[season_map[['season_name']] == 'winter','season_number'] <-4
+
+day_of_year_to_season <- function(day, output='season_name') {
+	if (!(output %in% c('season_name','season_number'))) {
+		stop("Output type must be 'season_name' or 'season_number'.")}
+	if (all(day >= 1 & day <= 366)) {
+		return(map[day,output])
+	} else {
+		stop("Argument 'day' must be (1,366).")
+	}
+}
+assign(x='map', value=season_map)
+
+day_count <- aggregate(season_map[,1], season_map['season_name'], length)
+season_duration <- day_count$x
+names(season_duration) <- day_count[,1]
+
+
+	
 
 
 

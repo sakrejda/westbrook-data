@@ -29,10 +29,10 @@ get_tags <- function(conn) {
 	return(tags_f)
 }
 
-map_tags <- function(tags, conn) {
+tag_to_tag_number <- function(tags, conn) {
 	tag_map <- get_tags(conn)	
-	tags <- tag_map[as.character(tag_map) == tags]
+	tag_mapping <- sapply(tags, function(tag) which(tag_map == tag))
+	tags <- as.numeric(tag_map[tag_mapping])
 	return(tags)
 }
-
 

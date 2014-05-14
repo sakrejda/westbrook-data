@@ -3,30 +3,19 @@ column_code <- list(
 	tag = function(tag) {
 		return(tag)
 	},
-	species = function(species) return(species),
-	sample_number = function(sample_name) {
-		sample_number <- sample_name_to_sample_number(sample_name)
-		return(sample_number)
-	},
-	detection_date = function(date) {
+	detection_date = function(earliest_detection_date_time) {
 		require(lubridate)
-		detection_date <- parse_date_time(x=date, orders='mdyhms')
+		detection_date <- parse_date_time(x=earliest_detection_date_time, orders='mdyhms')
 		detection_date[detection_date > now()] <- 
 			detection_date[detection_date > now()] - years(100)
 		return(detection_date)
 	},
-	season_number =  function(detection_date) {
-		season <- day_of_year_to_season(yday(detection_date), output='season_number')
-		return(season)
-	},
 	river = function(river) return(river),
 	area = function(area) return(area),
 	section = function(section) return(section),
-	observed_length = function(measured_length) {	
-		observed_length <- as.numeric(measured_length)
-	},
 	survey = function(survey) return(survey),
-	sample_name = function(sample_name) return(sample_name)
+	sample_name = function(sample_name) return(sample_name),
+	reader_id = function(reader_id) return(reader_id)
 )
 
 
@@ -41,7 +30,7 @@ new_columns <- names(column_code)
 source_columns <- sapply(column_code_args,`[`,1, USE.NAMES=FALSE)
 
 
-source_data <- dbGetQuery(conn, "SELECT * FROM tags_recaptures;")
+source_data <- dbGetQuery(conn, "SELECT * FROM tags_detected;")
 
 for (i in seq_along(source_columns)) {
 	print(source_columns[i])
@@ -54,7 +43,7 @@ for (i in seq_along(source_columns)) {
 }
 source_data <- source_data[,new_columns]
 
-dbWriteTable(conn_write, 'data_recaptures', source_data, row.names=FALSE,
+dbWriteTable(conn_write, 'data_detections', source_data, row.names=FALSE,
 						 overwrite=TRUE, append=FALSE)
 
 

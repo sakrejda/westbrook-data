@@ -21,23 +21,25 @@ for ( nom in electrofishing_samples ) {
 
 if (getOption('verbose',FALSE)) print(queries)
 
+dbSendQuery(conn,"DROP TABLE tags_recaptures_raw;")
 create_query <- paste0(
-	"CREATE TABLE tags_electrofishing_raw AS ",
+	"CREATE TABLE tags_recaptures_raw AS ",
 	"(", queries[[1]], ");"
 )
 dbSendQuery(conn, create_query)
 
 for (query in queries) {
 	insert_query <- paste0(
-		"INSERT INTO tags_electrofishing_raw ",
+		"INSERT INTO tags_recaptures_raw ",
 		"(", query, ");"
 	)
 	dbSendQuery(conn, insert_query)
 }
 
+dbSendQuery(conn, "DROP TABLE tags_recaptures;")
 create_tagged_fish_table <- paste0(
-	"CREATE TABLE tags_electrofishing AS (SELECT * FROM ",
-	"tags_electrofishing_raw WHERE tag IS NOT NULL);"
+	"CREATE TABLE tags_recaptures AS (SELECT * FROM ",
+	"tags_recaptures_raw WHERE tag IS NOT NULL);"
 )
 dbSendQuery(conn, create_tagged_fish_table)
 
