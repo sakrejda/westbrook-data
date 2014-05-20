@@ -4,6 +4,7 @@ column_code <- list(
 		return(tag)
 	},
 	species = function(species) return(species),
+	cohort = function(cohort) return(cohort),
 	sample_number = function(sample_name) {
 		sample_number <- sample_name_to_sample_number(sample_name)
 		return(sample_number)
@@ -41,7 +42,7 @@ new_columns <- names(column_code)
 source_columns <- sapply(column_code_args,`[`,1, USE.NAMES=FALSE)
 
 
-source_data <- dbGetQuery(conn, "SELECT * FROM tags_recaptures;")
+source_data <- dbGetQuery(link_1$conn, "SELECT * FROM tags_recaptures;")
 
 for (i in seq_along(source_columns)) {
 	print(source_columns[i])
@@ -54,7 +55,7 @@ for (i in seq_along(source_columns)) {
 }
 source_data <- source_data[,new_columns]
 
-dbWriteTable(conn_write, 'data_recaptures', source_data, row.names=FALSE,
+dbWriteTable(link_2$conn, 'data_recaptures', source_data, row.names=FALSE,
 						 overwrite=TRUE, append=FALSE)
 
 

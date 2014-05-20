@@ -1,5 +1,5 @@
-recaptures <- dbReadTable(conn,'data_recaptures')
-sampling <- dbReadTable(conn, 'data_sampling')
+recaptures <- dbReadTable(link_1$conn,'data_recaptures')
+sampling <- dbReadTable(link_1$conn, 'data_sampling')
 
 seasonal_recaptures <- recaptures[ 
 	recaptures[['sample_number']] %in%
@@ -16,7 +16,7 @@ pl <- ggplot(
 	aes(x=sample_number, y=as.numeric(as.factor(tag))  )
 ) + geom_raster()
 
-dbWriteTable(conn_write, 'data_seasonal_recaptures', seasonal_recaptures, row.names=FALSE,
+dbWriteTable(link_1$conn, 'data_seasonal_recaptures', seasonal_recaptures, row.names=FALSE,
 						 overwrite=TRUE, append=FALSE)
 
 trap_recaptures <- recaptures[
@@ -28,7 +28,7 @@ trap_recaptures <- unique(trap_recaptures[
 				trap_recaptures[['tag']],
 				trap_recaptures[['detection_date']]),])
 
-dbWriteTable(conn_write, 'data_trap_recaptures', trap_recaptures,
+dbWriteTable(link_1$conn, 'data_trap_recaptures', trap_recaptures,
 						 row.names=FALSE, overwrite=TRUE, append=FALSE)
 
 

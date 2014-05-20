@@ -15,22 +15,22 @@ if (getOption('verbose',FALSE)) print(queries)
 
 tags <- data.frame(tag=NULL, species=NULL)
 for (query in queries) {
-	tags <- rbind(tags,dbGetQuery(conn, paste0(query,";")))
+	tags <- rbind(tags,dbGetQuery(link_1$conn, paste0(query,";")))
 	tags <- unique(tags)
 }
 tags[['tag_number']] <- as.numeric(factor(x=tags[['tag']]))
 
-dbSendQuery(conn,'DROP TABLE tags;')
-dbWriteTable(conn_write, 'tags', tags, row.names=FALSE)
+dbSendQuery(link_1$conn,'DROP TABLE tags;')
+dbWriteTable(link_1$conn, 'tags', tags, row.names=FALSE)
 
-get_tags <- function(conn) {
-	tags <- dbGetQuery(conn, "SELECT * FROM tags ORDER BY tag_number;")
+get_tags <- function(link) {
+	tags <- dbGetQuery(link$conn, "SELECT * FROM tags ORDER BY tag_number;")
 	tags_f <- factor(x=tags$tag_number, labels=tags$tag)
 	return(tags_f)
 }
 
-tag_to_tag_number <- function(tags, conn) {
-	tag_map <- get_tags(conn)	
+tag_to_tag_number <- function(tags, link) {
+	tag_map <- get_tags(link)	
 	tag_mapping <- sapply(tags, function(tag) which(tag_map == tag))
 	tags <- as.numeric(tag_map[tag_mapping])
 	return(tags)

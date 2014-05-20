@@ -30,7 +30,7 @@ new_columns <- names(column_code)
 source_columns <- sapply(column_code_args,`[`,1, USE.NAMES=FALSE)
 
 
-source_data <- dbGetQuery(conn, "SELECT * FROM tags_detected;")
+source_data <- dbGetQuery(link_1$conn, "SELECT * FROM tags_detected;")
 
 for (i in seq_along(source_columns)) {
 	print(source_columns[i])
@@ -43,7 +43,7 @@ for (i in seq_along(source_columns)) {
 }
 source_data <- source_data[,new_columns]
 
-dbWriteTable(conn_write, 'data_detections', source_data, row.names=FALSE,
+dbWriteTable(link_2$conn, 'data_detections', source_data, row.names=FALSE,
 						 overwrite=TRUE, append=FALSE)
 
 

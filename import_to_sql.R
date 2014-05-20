@@ -19,7 +19,7 @@ for ( name in tag_data_names) {
 	}
 	## It's all character format up through here!
 	write.csv(x=data, file=file.path(processed_data_dir,paste0(name,'.csv')), row.names=FALSE)
-	dbWriteTable(conn=conn, name=name, value=data,row.names=FALSE,
+	dbWriteTable(conn=link_1$conn, name=name, value=data,row.names=FALSE,
 							 overwrite=TRUE, append=FALSE)
 
 
