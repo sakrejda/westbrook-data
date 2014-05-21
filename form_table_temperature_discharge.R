@@ -1,6 +1,9 @@
 root <- '~/data_store/westbrook'
 adjusted_data <- file.path(root,'adjusted_data')
 source('~/data_management/generic/data_cleaning_functions.R')
+library(ggplot2)
+library(reshape2)
+
 
 ## Data cleaning:
 ed <- read.csv(
@@ -103,6 +106,43 @@ related_to_seasonal_dynamics <- ggplot(
 ) + geom_point(size=1) + 
 		geom_line(aes(x=day_of_year, y=typical_log10_discharge)) +
 		xlab("Day of Year") + ylab("Discharge (Log 10)")
+
+
+## Comparison:
+comp <- by(
+	data=edj,
+	INDICES=list(month=edj[['month']], year=edj[['year']]),
+	FUN=function(edj) {
+		month <- unique(edj[['month']])
+		year <- unique(edj[['year']])
+		ZSAT <- mean(edj[['temperature']])
+		ZSAD <- mean(log(edj[['discharge']]))
+		ZST <- mean(edj[['ZST']])
+		ZSD <- mean(edj[['ZSD']])
+		return(data.frame(
+			year=rep(year,2),
+			month=rep(month,2), 
+			average = c(ZSAT,ZSAD),
+			seasonal = c(ZST,ZSD),
+			source=c('temperature','discharge')))
+	}
+)
+comp <- do.call(what=rbind, args=comp)
+comp_plot <- ggplot(
+	data=comp, 
+	aes(x=average, y=seasonal, colour=factor(source))
+) + geom_point() + 
+		facet_wrap( ~ month + source, scales='free')
+
+## So the mean used is different but ultimately the relationship is
+## linear. Woohoo!
+
+
+
+
+
+
+
 
 
 
