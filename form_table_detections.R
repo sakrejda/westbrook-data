@@ -12,11 +12,11 @@ select_stmt <- paste(
 
 if (getOption('verbose',FALSE)) print(queries)
 
-dbSendQuery(link_1$conn, "DROP TABLE tags_detected;")
+dbSendQuery(link$conn, "DROP TABLE tags_detected;")
 create_query <- paste0(
 	"CREATE TABLE tags_detected AS ",
 	"(", select_stmt, ");"
 )
-dbSendQuery(link_1$conn, create_query)
+dbSendQuery(link$conn, create_query)
 
 

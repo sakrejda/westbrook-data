@@ -41,7 +41,7 @@ ed[['month']] <- month(ed[['date_ct']])
 ed[['year']] <- year(ed[['date_ct']])
 ed[['day_of_year']] <- yday(ed[['date_ct']])
 
-dbWriteTable(conn=link_1$conn, name='data_environmental', value=ed,
+dbWriteTable(conn=link$conn, name='data_environmental', value=ed,
 						 row.names=FALSE, overwrite=TRUE, append=FALSE)
 
 ## Construct smooth for temperature:
@@ -81,7 +81,7 @@ average_ed <- data.frame(
 	typical_temperature = temperature_average[['temperature']],
 	typical_log10_discharge=discharge_average[['discharge']]
 )
-dbWriteTable(conn=link_1$conn, name='data_environmental_average',
+dbWriteTable(conn=link$conn, name='data_environmental_average',
 						 value=average_ed, row.names=FALSE, overwrite=TRUE, append=FALSE)
 
 # Merge:

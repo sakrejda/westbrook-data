@@ -1,4 +1,3 @@
-## formalArgs can get arg name, use it for mapping!
 column_code <- list(
 	tag = function(tag) {
 		return(tag)
@@ -31,31 +30,11 @@ column_code <- list(
 )
 
 
-column_code_args <- lapply(
-	X = column_code,
-	FUN = function(f) {
-		arg_names <- formalArgs(f)
-		return(arg_names)
-	}
-)
-new_columns <- names(column_code)
-source_columns <- sapply(column_code_args,`[`,1, USE.NAMES=FALSE)
+source_data <- dbGetQuery(link$conn, "SELECT * FROM tags_recaptures;")
+source_data <- pipeline_data_transformation(
+	data=source_data, pipeline=column_code)
 
-
-source_data <- dbGetQuery(link_1$conn, "SELECT * FROM tags_recaptures;")
-
-for (i in seq_along(source_columns)) {
-	print(source_columns[i])
-	f <- column_code[[ new_columns[i] ]]
-	args <- list()
-	for ( arg in column_code_args[[i]] ) {
-		args[[arg]] <- with(data=source_data, expr=get(x=arg))
-	}
-	source_data[[ new_columns[i] ]] <- do.call(what=f, args=args)
-}
-source_data <- source_data[,new_columns]
-
-dbWriteTable(link_2$conn, 'data_recaptures', source_data, row.names=FALSE,
+dbWriteTable(link$conn, 'data_recaptures', source_data, row.names=FALSE,
 						 overwrite=TRUE, append=FALSE)
 
 

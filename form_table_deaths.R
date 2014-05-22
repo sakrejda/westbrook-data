@@ -8,11 +8,11 @@ select_stmt <- paste(
 		"FROM", "tags_dead"
 	)
 
-dbSendQuery(link_1$conn, "DROP TABLE tags_found")
+dbSendQuery(link$conn, "DROP TABLE tags_found")
 create_query <- paste0(
 	"CREATE TABLE tags_found AS ",
 	"(", select_stmt, ");"
 )
-dbSendQuery(link_1$conn, create_query)
+dbSendQuery(link$conn, create_query)
 
 
