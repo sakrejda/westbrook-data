@@ -3,7 +3,11 @@ column_code <- list(
 		return(tag)
 	},
 	species = function(species) return(species),
-	cohort = function(cohort) return(cohort),
+	cohort = function(cohort) {
+		nr <- length(cohort)
+		cohort <- cohort[!is.na(cohort)]
+		return(rep(cohort,nr))
+	},
 	sample_number = function(sample_name) {
 		sample_number <- sample_name_to_sample_number(sample_name)
 		return(sample_number)

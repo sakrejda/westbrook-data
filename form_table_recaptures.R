@@ -28,7 +28,7 @@ create_query <- paste0(
 )
 dbSendQuery(link$conn, create_query)
 
-for (query in queries) {
+for (query in queries[2:length(queries)]) {
 	insert_query <- paste0(
 		"INSERT INTO tags_recaptures_raw ",
 		"(", query, ");"
