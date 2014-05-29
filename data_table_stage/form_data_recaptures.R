@@ -3,6 +3,9 @@ column_code <- list(
 #		return(paste(tag, species, sep='-'))
 		return(tag)
 	},
+	fish_number = function(fish_number) {
+		return(fish_number)
+	},
 	species = function(species) return(species),
 	cohort = function(cohort, tag) {  ## cohort is not well defined.
 		return(cohort)

@@ -13,10 +13,10 @@ boundary_detections <- boundary_detections[ boundary_detections[['tag']] %in% ta
 detections <- rbind(
 	data.frame(
 		trap_recaptures[,c('tag','detection_date','observed_length','survey')],
-		sample_name='trap', status='trap_recapture'),
+		sample_name='trap', status='trap_recapture', fish_number=as.numeric(NA)),
 	data.frame(boundary_detections[,c('tag','detection_date','survey')], 
 		observed_length=NA, sample_name='antenna_detection',
-		status='boundary_detection')
+		status='boundary_detection', fish_number=as.numeric(NA))
 )
 
 extra_columns_for_detections <- names(recaptures)[!(names(recaptures) %in% names(detections))]

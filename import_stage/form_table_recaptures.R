@@ -1,5 +1,5 @@
 columns <- list(
-	who = c('tag'),
+	who = c('tag','fish_number'),
 	when = c('date','sample_name'),
 	where = c('river','area','section'),
 	how = c('sample_type','survey'),

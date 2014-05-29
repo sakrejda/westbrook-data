@@ -23,10 +23,12 @@ split_tag <- mclapply(
 		}
 		if (!is.na(tag_history[1,'observed_length'])) {
 			tag_length <- tag_history[1,'observed_length']
+			tag_which <- 1
 		} else {
 			some_lengths <- tag_history[,'observed_length']
 			if (!all(is.na(some_lengths))) {
 				tag_length <- min(some_lengths,na.rm=TRUE)
+				tag_which <- which(tag_history[,'observed_length'] == tag_length)
 			} else {
 				tag_length <- NA
 			}
@@ -45,23 +47,30 @@ split_tag <- mclapply(
 				}
 				if (!is.na(tag_history[i,'observed_length'])) {
 					new_length <- tag_history[i,'observed_length']
-					interval <- days(round(tag_history[i,'detection_date'] - tag_history[i-1,'detection_date']))
-					if (!is.na(tag_length) && (new_length - tag_length) < -10) {
+					interval <- days(round(tag_history[i,'detection_date'] -
+																 tag_history[tag_which,'detection_date']))
+					if (!is.na(tag_length) && ((new_length - tag_length) < -10) ) {
 						tag_length <- new_length
+						tag_which <- which(tag_history[,'observed_length'] == tag_length)
 						bump_subtag <- TRUE
 					}
 					if (
 						!is.na(tag_length) && 
-						( (new_length - tag_length) >  45) &&
-						interval < days(round(365/4))
+						( (new_length - tag_length) >  60) &&
+						(interval < days(round(365/4)))
 					) {
 						tag_length <- new_length
+						tag_which <- which(tag_history[,'observed_length'] == tag_length)
 						bump_subtag <- TRUE
 					}
 				} else {
 					# DO NOTHING.
 				}
-				tag_history[i,'subtag'] <- tag_history[i-1,'subtag'] + bump_subtag
+				if (bump_subtag) {
+					tag_history[i,'subtag'] <- tag_history[i-1,'subtag'] + 1
+				} else {
+					tag_history[i,'subtag'] <- tag_history[i-1,'subtag']
+				}
 				if (!is.na(tag_history[i,'species']))
 					tag_species <- tag_history[i,'species']
 				if (!is.na(tag_history[i,'observed_length'])) 
@@ -72,6 +81,7 @@ split_tag <- mclapply(
 	}
 )
 
+tag_history <- do.call(what=rbind, args=split_tag)
 
 #dbWriteTable(link$conn, 'data_tag_history', tag_history, row.names=FALSE,
 #						 overwrite=TRUE, append=FALSE)
