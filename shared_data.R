@@ -1,6 +1,7 @@
 library(RPostgreSQL)
 library(lubridate)
 library(integrator)
+library(parallel)
 
 options(stringsAsFactors=FALSE)
 options(check.names=FALSE)

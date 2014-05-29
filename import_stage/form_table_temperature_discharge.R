@@ -135,7 +135,7 @@ comp_plot <- ggplot(
 		facet_wrap( ~ month + source, scales='free')
 
 ## So the mean used is different but ultimately the relationship is
-## linear. Woohoo!
+## linear-ish. Woohoo!
 
 
 
