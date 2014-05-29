@@ -12,6 +12,7 @@ script_order <- c(
 	"form_data_detections.R",
 	"form_data_emigrations.R",
 	"form_data_recaptures.R",
+#	"form_data_tags.R",
 	
 	"form_data_seasonal.R",
 	"form_data_trap_captures.R",

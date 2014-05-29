@@ -1,7 +1,8 @@
 column_code <- list(
-	tag = function(tag) {
+  tag = function(tag) {
+	#	    return(paste(tag, species, sep='-'))
 		return(tag)
-	},
+  },
 	detection_date = function(earliest_detection_date_time) {
 		require(lubridate)
 		detection_date <- parse_date_time(x=earliest_detection_date_time, orders='mdyhms')
