@@ -36,7 +36,7 @@ errors <- list(
 		`#` = list(species = 'bnt')
 	),
 	list(tag = '257c67f184', sample_name = 'antenna_detection',
-		detection_date = ymd_hms('2009-06-08 21:38:00'),
+		detection_date = ymd_hms('2009-06-08 21:38:00',tz=''),
 		`#` = list(species = 'bnt')
 	),
 	list(tag = '1bf118c99b', fish_number = '9', sample_name = '35',
@@ -68,7 +68,7 @@ errors <- list(
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '1bf189cafc', sample_name = 'antenna_detection',
-		detection_date = ymd_hms('2005-11-02 11:32:05'),
+		detection_date = ymd_hms('2005-11-02 11:32:05',tz=''),
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '1bf18a479e', fish_number = '3', sample_name = '55',
@@ -89,7 +89,8 @@ errors <- list(
 	),
 	list(tag = '1bf1983387', fish_number = '1', sample_name = '52',
 		section = '14',
-		`#` = list(DROP = TRUE),
+		`#` = list(DROP = TRUE)
+	),
 	list(tag = '1bf1984439', fish_number = '6', sample_name = '54',
 		section = '46',
 		`#` = list(observed_length = as.numeric(NA))
@@ -119,7 +120,7 @@ errors <- list(
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '1bf20ea365', sample_name = 'antenna_detection',
-		detection_date = ymd_hms('2008-09-30 03:25:00'),
+		detection_date = ymd_hms('2008-09-30 03:25:00',tz=''),
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '1bf20ea89a', fish_number = '4', sample_name = '56', 
@@ -139,7 +140,7 @@ errors <- list(
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '1bf20ebf47', sample_name = 'antenna_detection',
-		detection_date = ymd_hms('2009-03-02 11:34:58'),
+		detection_date = ymd_hms('2009-03-02 11:34:58',tz=''),
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '1bf20ec5e1', fish_number = '1', sample_name = '54',
@@ -167,7 +168,7 @@ errors <- list(
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '257c67e972', fish_number = '2', sample_name = '68',
-		section = '68',
+		section = '39',
 		`#` = list(species = 'bkt')
 	),
 	list(tag = '257c6cc783', fish_number = '3', sample_name = '66',
@@ -180,11 +181,5 @@ errors <- list(
 	)
 )
 
-
-
-
-
-
-)
 
 
