@@ -21,10 +21,10 @@ column_code <- list(
 			detection_date[detection_date > now()] - years(100)
 		return(detection_date)
 	},
-	season_number =  function(detection_date) {
-		season <- day_of_year_to_season(yday(detection_date), output='season_number')
-		return(season)
-	},
+#	season_number =  function(detection_date) {
+#		season <- day_of_year_to_season(yday(detection_date), output='season_number')
+#		return(season)
+#	},
 	river = function(river) return(river),
 	area = function(area) return(area),
 	section = function(section) return(section),
