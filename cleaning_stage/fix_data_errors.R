@@ -37,5 +37,7 @@ if (length(drop_these) != 0) {
 	cat("No records to drop.\n")
 }
 
+dbWriteTable(link$conn, 'data_corrected_tag_history', tag_history, 
+						 row.names=FALSE, overwrite=TRUE, append=FALSE)
 
 
