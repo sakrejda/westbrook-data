@@ -25,7 +25,7 @@ do <- list(
 
 	assert_stage = c(
 		"assert_tag_properties.R",
-		"assert_data_errors."
+		"assert_data_errors.R"
 	),
 
 	cleaning_stage = c(

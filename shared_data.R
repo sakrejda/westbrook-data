@@ -2,6 +2,8 @@ library(RPostgreSQL)
 library(lubridate)
 library(integrator)
 library(parallel)
+library(reshape2)
+library(ggplot2)
 
 options(stringsAsFactors=FALSE)
 options(check.names=FALSE)

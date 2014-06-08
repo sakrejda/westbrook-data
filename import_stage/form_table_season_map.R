@@ -50,7 +50,7 @@ season_breaks <- merge(
 	x=season_breaks, by.x='season', y=day_count, by.y='season_number')
 
 
-dbWriteTable(conn=link$conn, name='season_breaks', value=season_breaks,
+dbWriteTable(conn=link$conn, name='season_data', value=season_breaks,
 						 row.names=FALSE, overwrite=TRUE, append=FALSE)
 
 
