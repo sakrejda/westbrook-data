@@ -7,6 +7,8 @@ do <- list(
 		"form_table_recaptures.R",
 		
 		"form_table_samples.R",
+		"calculate_season_breaks.R",
+		"form_table_season_map.R",
 		"form_table_tags.R"
 	),
 	
