@@ -37,6 +37,20 @@ if (length(drop_these) != 0) {
 	cat("No records to drop.\n")
 }
 
+split_tag_history <- split(x=tag_history, f=tag_history[['tag']])
+
+split_tag_history <- mclapply(
+	X=split_tag_history,
+	FUN=function(history) {
+		originals <- !duplicated(history[['detection_date']])
+		history <- history[originals,]
+		return(history)
+	},
+	mc.cores=getOption("mc.cores",6)
+)
+
+tag_history <- do.call(what=rbind, args=split_tag_history)
+
 dbWriteTable(link$conn, 'data_corrected_tag_history', tag_history, 
 						 row.names=FALSE, overwrite=TRUE, append=FALSE)
 
