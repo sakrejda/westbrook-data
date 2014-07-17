@@ -34,7 +34,10 @@ do <- list(
 	),
 
 	processing_stage = c(
-		"form_per_tag_data.R"
+		"form_per_tag_data.R",
+		"form_occasion_points.R",
+		"form_recapture_points.R",
+		"form_uncaptured_rows.R"
 	)
 )
 	

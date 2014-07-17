@@ -1,0 +1,75 @@
+tags <- names(id_tables)
+
+if (any(tags != names(id_tables))) stop("Sort id_tables before continuing.")
+if (any(tags != names(occasion_points))) stop("Sort occasion_points before continuing.")
+if (any(tags != names(sample_points))) stop("Sort sample_points before continuing.")
+
+occasion_rows <- mcmapply(
+	FUN=function(tag, occasion_points, tag_table, occasion) {
+		rows = occasion_points
+		o <- data.frame(
+			tag = tag,
+			species = tag_table[['species']],
+			cohort = tag_table[['cohort']],
+			sample_number = as.numeric(NA),
+			detection_date = occasion[rows,'detection_date'],
+			river = as.character(NA),
+			area = as.character(NA),
+			section = as.character(NA),
+			observed_length = as.numeric(NA),
+			survey = "shock",
+			sample_name = 'pretend',
+			status = "season_break"
+		)
+		return(o)
+	},
+	tag = tags,
+	occasion_points = occasion_points,
+	tag_table = id_tables,
+	MoreArgs = list(occasion=occasions),
+	SIMPLIFY=FALSE
+)
+
+
+sampling_rows <- mcmapply(
+	FUN=function(tag, sample_points, tag_table, sampling, recaptures) {
+		sample_points <- sample_points[!(sample_points %in% recaptures[[tag]][['sample_number']])]
+		rows <- which(
+			(sampling[['sample_number']] %in% sample_points) 
+		)
+		nr <- length(rows)
+		if (nr == 0) return(NULL)
+		day_diff <- days(sampling[rows,'end_date'] - sampling[rows,'start_date'])
+		class(day_diff) <- "numeric"
+		day_diff <- days(round(day_diff*runif(nr,0,1)))
+		imputed_date <- sampling[rows,'start_date'] + day_diff
+		o <- data.frame(
+			tag = tag,
+			species = tag_table[['species']],
+			cohort = tag_table[['cohort']],
+			sample_number = sampling[rows,'sample_number'],
+			detection_date = imputed_date,
+			river = as.character(NA),
+			area = as.character(NA),
+			section = as.character(NA),
+			observed_length = as.numeric(NA),
+			survey = "shock",
+			sample_name = sampling[rows,'sample_name'],
+			status = "uncaptured"
+		)
+		return(o)
+	},
+	tag = tags,
+	sample_points = sample_points,
+	tag_table = id_tables,
+	MoreArgs = list(
+		sampling=sampling,
+		recaptures=split(x=tag_history, f=tag_history[['tag']])
+	),
+	SIMPLIFY=FALSE
+)
+
+
+
+
+
