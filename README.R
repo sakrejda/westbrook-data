@@ -20,7 +20,8 @@ do <- list(
 		"form_data_seasonal.R",
 		"form_data_trap_captures.R",
 		"form_data_smolts.R",
-		"form_data_tag_history.R"
+		"form_data_tag_history.R",
+		"form_data_locations.R"
 	),
 
 	assert_stage = c(
@@ -30,6 +31,10 @@ do <- list(
 
 	cleaning_stage = c(
 		"fix_data_errors.R"
+	),
+
+	processing_stage = c(
+		"form_per_tag_data.R"
 	)
 )
 	
