@@ -36,8 +36,9 @@ do <- list(
 	processing_stage = c(
 		"form_per_tag_data.R",
 		"form_occasion_points.R",
+		"form_occasion_rows.R",
 		"form_sample_points.R",
-		"form_uncaptured_rows.R"
+		"form_sample_rows.R"
 	)
 )
 	
@@ -47,6 +48,7 @@ for (stage in names(do)) {
 		s <- file.path(stage,script)
 		cat(s,"\n")
 		source(file=s)
+		rm(list=ls()[!(ls() %in% keep_objects)])
 	}
 }
 

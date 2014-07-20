@@ -34,7 +34,9 @@ occasion_rows <- mcmapply(
 	SIMPLIFY=FALSE
 )
 
-dbWriteTable(conn=link$conn, name='occasion_rows', value=occasion_rows, overwrite=TRUE, row.names=FALSE)
+occasion_rows <- batch_rbind(occasion_rows)
+
+dbWriteTable(conn=link$conn, name='state_occasion_rows', value=occasion_rows, overwrite=TRUE, row.names=FALSE)
 
 
 

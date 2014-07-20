@@ -49,7 +49,9 @@ sampling_rows <- mcmapply(
 	SIMPLIFY=FALSE
 )
 
-dbWriteTable(conn=link$conn, name='sampling_rows', value=sampling_rows, overwrite=TRUE, row.names=FALSE)
+sampling_rows <- batch_rbind(sampling_rows)
+
+dbWriteTable(conn=link$conn, name='state_sampling_rows', value=sampling_rows, overwrite=TRUE, row.names=FALSE)
 
 
 
