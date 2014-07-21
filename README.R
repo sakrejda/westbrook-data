@@ -48,10 +48,18 @@ do <- list(
 source('shared_data.R')
 for (stage in names(do)) {
 	for (script in do[[stage]]) {
-		s <- file.path(stage,script)
-		cat(s,"\n")
-		source(file=s)
-		rm(list=ls()[!(ls() %in% keep_objects)])
+		temp <- new.env(parent=shared_data)
+		temp[['shared_data']] <- shared_data
+		with(
+			data=temp,
+			expr= {
+				s <- file.path(stage,script)
+				cat(s,"\n")
+				source(file=s)
+			}
+		)
+		rm(envir=temp, list='shared_data')
+		rm(temp)
 	}
 }
 

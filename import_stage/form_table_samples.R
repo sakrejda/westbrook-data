@@ -81,11 +81,13 @@ dbWriteTable(conn=link$conn, name='data_sampling',value=sampling,
 						 overwrite=TRUE, row.names=FALSE)
 
 ## Embarassed to write code like this:  <3 !
-sample_name_to_sample_number <- function(sample_name) {
-	return(sample_number_map[sample_name])
-}
-assign(x='sample_number_map', value=unlist(sample_number_map),
-			 envir=environment(sample_name_to_sample_number))
+with(data=shared_data, expr={
+	sample_name_to_sample_number <- function(sample_name) {
+		return(sample_number_map[sample_name])
+	}
+	assign(x='sample_number_map', value=unlist(sample_number_map),
+		envir=environment(sample_name_to_sample_number))
+})
 ## End terrible... <3
 
 
