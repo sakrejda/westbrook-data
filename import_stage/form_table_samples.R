@@ -85,9 +85,10 @@ with(data=shared_data, expr={
 	sample_name_to_sample_number <- function(sample_name) {
 		return(sample_number_map[sample_name])
 	}
-	assign(x='sample_number_map', value=unlist(sample_number_map),
-		envir=environment(sample_name_to_sample_number))
 })
+
+assign(x='sample_number_map', value= unlist(sample_number_map), envir=shared_data)
+
 ## End terrible... <3
 
 

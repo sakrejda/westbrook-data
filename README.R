@@ -55,7 +55,7 @@ for (stage in names(do)) {
 			expr= {
 				s <- file.path(stage,script)
 				cat(s,"\n")
-				source(file=s)
+				source(file=s, local=TRUE)
 			}
 		)
 		rm(envir=temp, list='shared_data')
