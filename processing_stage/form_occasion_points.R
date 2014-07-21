@@ -1,3 +1,5 @@
+id_table <- dbGetQuery(link$conn, "SELECT * FROM data_per_tag;")
+
 sampling <- dbGetQuery(link$conn, "SELECT * FROM data_sampling;")
 season_breaks <- dbGetQuery(link$conn, "SELECT * FROM season_data;")
 
