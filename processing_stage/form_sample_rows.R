@@ -3,7 +3,7 @@ id_tables <- split(x=id_table, f=id_table[['tag']])
 tags <- names(id_tables)
 
 sample_points <- readRDS(file=file.path(processed_data_dir,'sample_points.rds'))
-samplings <- dbGetQuery(link$conn, "SELECT * FROM data_samplings;")
+sampling <- dbGetQuery(link$conn, "SELECT * FROM data_sampling;")
 
 tag_history <- dbGetQuery(link$conn, "SELECT * FROM data_corrected_tag_history;")
 
