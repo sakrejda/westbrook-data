@@ -1,4 +1,6 @@
-errors <- list(
+assign(
+	x='errors', 
+	value= list(
 	list(tag = '1bf18b9cf9', fish_number = '12', sample_name = '56',
 		section = '0', 
 		`#` = list(observed_length = as.numeric(220))
@@ -179,7 +181,7 @@ errors <- list(
 		section = '23',
 		`#` = list(DROP = TRUE)
 	)
-)
+), envir=shared_data)
 
 
 
