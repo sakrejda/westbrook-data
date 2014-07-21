@@ -39,6 +39,9 @@ do <- list(
 		"form_occasion_rows.R",
 		"form_sample_points.R",
 		"form_sample_rows.R"
+	),
+	state_stage = c(
+		"form_state_table.R"
 	)
 )
 	

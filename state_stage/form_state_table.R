@@ -1,7 +1,7 @@
 ## Load state bits:
-occasion_table <- dbGetQUery(link$conn, "SELECT * FROM state_occasion_rows;")
+occasion_table <- dbGetQuery(link$conn, "SELECT * FROM state_occasion_rows;")
 
-sampling_table <- dbGetQUery(link$conn, "SELECT * FROM state_sample_rows;")
+sampling_table <- dbGetQuery(link$conn, "SELECT * FROM state_sample_rows;")
 sampling_table <- sampling_table[,names(occasion_table)]
 
 ## Load tag histories:
