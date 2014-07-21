@@ -1,3 +1,4 @@
+tag_history <- dbGetQuery(link$conn, statement = "SELECT * FROM data_tag_history;")
 
 drop_these <- vector(mode='numeric', length=0)
 could_not_find <- list()
