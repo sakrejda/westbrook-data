@@ -79,6 +79,34 @@ covariate_pipeline <- list(
 			stop_date <= last_detection
 		surviving[known_surviving] <- 1
 		return(surviving)
+	},
+	tagged <- function(status) {
+		tagged <- vector(mode='numeric', length=length(status))
+		first <- min(which(status == 'recaptured'))
+		tagged[(first+1):length(tagged)] <- 1
+		return(tagged)
+	},
+	censored <- function(status) {
+		censored <- vector(mode='numeric', length=length(status))
+		if (!any(status == 'boundary_detection') &&
+				!any(status == 'trap_recapture'    )
+		) {
+			return(censored)
+		} else {
+			last <- max(which(status %in% c('trap_recapture','boundary_detection')))
+			censored[(last+1):length(censored)] <- 1
+		}
+		return(censored)
+	},
+	cjs_classification = function(status, surviving, censored) {
+		cjs_classification <- vector(mode='numeric', length=length(status))
+		cjs_classification[surviving == 1 & status == 'recaptured'] <- 1
+		cjs_classification[surviving == 1 & status == 'uncaptured'] <- 2
+		cjs_classification[surviving == 1 & status == 'boundary_detection'] <- 3
+		cjs_classification[surviving == 1 & status == 'trap_recapture'] <- 4
+		cjs_classification[surviving == 0 & censored == 0] <- 5
+		cjs_classification[surviving == 0 & censored == 1] <- 6
+		return(cjs_classification)
 	}
 )
 
