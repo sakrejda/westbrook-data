@@ -16,7 +16,7 @@ covariate_pipeline <- list(
 	},
 	start_date = function(detection_date) {
 		l <- length(detection_date)
-		date <- c(NA,detection_date[1:(l-1)])
+		date <- c(ymd_hms(NA),detection_date[1:(l-1)])
 		return(date)
 	},
 	stop_date = function(detection_date) {
