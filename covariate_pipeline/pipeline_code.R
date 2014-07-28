@@ -80,13 +80,13 @@ covariate_pipeline <- list(
 		surviving[known_surviving] <- 1
 		return(surviving)
 	},
-	tagged <- function(status) {
+	tagged = function(status) {
 		tagged <- vector(mode='numeric', length=length(status))
 		first <- min(which(status == 'recaptured'))
 		tagged[(first+1):length(tagged)] <- 1
 		return(tagged)
 	},
-	censored <- function(status) {
+	censored = function(status) {
 		censored <- vector(mode='numeric', length=length(status))
 		if (!any(status == 'boundary_detection') &&
 				!any(status == 'trap_recapture'    )
