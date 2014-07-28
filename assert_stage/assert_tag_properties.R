@@ -83,6 +83,6 @@ split_tag <- mclapply(
 
 tag_history <- do.call(what=rbind, args=split_tag)
 
-#dbWriteTable(link$conn, 'data_tag_history', tag_history, row.names=FALSE,
-#						 overwrite=TRUE, append=FALSE)
+dbWriteTable(link$conn, 'data_tag_history', tag_history, row.names=FALSE,
+						 overwrite=TRUE, append=FALSE)
 
