@@ -100,12 +100,12 @@ covariate_pipeline <- list(
 	},
 	cjs_classification = function(status, surviving, censored) {
 		cjs_classification <- vector(mode='numeric', length=length(status))
-		cjs_classification[surviving == 1 & status == 'recaptured'] <- 1
-		cjs_classification[surviving == 1 & status == 'uncaptured'] <- 2
-		cjs_classification[surviving == 1 & status == 'boundary_detection'] <- 3
-		cjs_classification[surviving == 1 & status == 'trap_recapture'] <- 4
-		cjs_classification[surviving == 0 & censored == 0] <- 5
-		cjs_classification[surviving == 0 & censored == 1] <- 6
+		cjs_classification[tagged == 1 & surviving == 1 & status == 'recaptured'] <- 1
+		cjs_classification[tagged == 1 & surviving == 1 & status == 'uncaptured'] <- 2
+		cjs_classification[tagged == 1 & surviving == 1 & status == 'boundary_detection'] <- 3
+		cjs_classification[tagged == 1 & surviving == 1 & status == 'trap_recapture'] <- 4
+		cjs_classification[tagged == 1 & surviving == 0 & censored == 0] <- 5
+		cjs_classification[tagged == 1 & surviving == 0 & censored == 1] <- 6
 		return(cjs_classification)
 	}
 )
