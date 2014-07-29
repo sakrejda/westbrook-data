@@ -98,7 +98,7 @@ covariate_pipeline <- list(
 		}
 		return(censored)
 	},
-	cjs_classification = function(status, surviving, censored) {
+	cjs_classification = function(status, surviving, censored, tagged) {
 		cjs_classification <- vector(mode='numeric', length=length(status))
 		cjs_classification[tagged == 1 & surviving == 1 & status == 'recaptured'] <- 1
 		cjs_classification[tagged == 1 & surviving == 1 & status == 'uncaptured'] <- 2
