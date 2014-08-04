@@ -105,7 +105,8 @@ covariate_pipeline <- list(
 		cjs_classification[tagged == 1 & surviving == 1 & status == 'boundary_detection'] <- 3
 		cjs_classification[tagged == 1 & surviving == 1 & status == 'trap_recapture'] <- 4
 		cjs_classification[tagged == 1 & surviving == 1 & status == 'season_break'] <- 5
-		cjs_classification[tagged == 1 & surviving == 0 & censored == 0] <- 6
+		cjs_classification[tagged == 1 & surviving == 0 & censored == 0 & 
+											 (status == 'season_break' | status == 'uncaptured')] <- 6
 		cjs_classification[tagged == 1 & surviving == 0 & censored == 1] <- 7
 		return(cjs_classification)
 	}
