@@ -9,8 +9,9 @@ sampling <- dbGetQuery(link$conn, "SELECT * FROM data_sampling;")
 ## Occasion data:
 occasions <- dbGetQuery(link$conn, "SELECT * FROM data_occasions;")
 
-## Load state table:
+## Load state table and sort it---it must be sorted after loading.
 state <- dbGetQuery(link$conn, "SELECT * FROM state_table WHERE species = 'ats';")
+state <- state[order(state[['tag']], state[['detection_date']]),]
 
 ## Load environmental table:
 edj <- dbGetQuery(link$conn, "SELECT date_ct, zst, zsd  FROM data_environmental_with_zst_zsd")
@@ -44,7 +45,7 @@ split_state <- mclapply(
 	mc.cores=getOption('mc.cores',6L)
 )
 
-state <- do.call(what=rbind, args=state)
+state <- do.call(what=rbind, args=split_state)
 
 
 ## Make data globally available in shared_data.
@@ -55,6 +56,5 @@ assign(x='occasions', value=occasions, envir=shared_data)
 assign(x='state', value=state, envir=shared_data)
 assign(x='split_state', value=split_state, envir=shared_data)
 assign(x='edj', value=edj, envir=shared_data)
-
 
 

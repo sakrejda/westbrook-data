@@ -1,6 +1,11 @@
 
+covariate_pipeline <-	dependency_resolver(covariate_pipeline)
+
+
 split_state <- mcmapply(
-		FUN = function(state, tag_data, pipeline_code, age_breaks, env_table) {
+		FUN = function(state, tag_data, pipeline_code, age_breaks,
+									 env_table, antennas_start
+		) {
 			## Environment for pipeline.
 			local_env <- new.env()
 			local_env[['breaks']] <- age_breaks
@@ -9,6 +14,7 @@ split_state <- mcmapply(
 			local_env[['recruit_date']] <- tag_data[['first_capture']]
 			local_env[['last_detection']] <- tag_data[['last_detection']]
 			local_env[['covariate_table']] <- env_table
+			local_env[['antennas_start']] <- antennas_start
 
 			state.bk <- state
 			state <- pipeline_data_transformation(
@@ -25,7 +31,8 @@ split_state <- mcmapply(
 		MoreArgs = list(
 			pipeline_code = covariate_pipeline,
 			age_breaks = occasions[['detection_date']],
-			env_table = edj
+			env_table = edj,
+			antennas_start = min(state[['detection_date']][state[['status']] == 'boundary_detection'])
 		),
 		mc.cores = getOption("mc.cores", 6L),
 		SIMPLIFY=FALSE

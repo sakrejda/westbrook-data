@@ -5,6 +5,7 @@ rownames(state) <- 1:nrow(state)
 if (nrow(state) != nrow(unique(state))) {
 	warning("Duplicate state rows exist. Dropping them.")
 	state.bk <- state
+	assign(x='state.bk', value=state.bk, envir=.GlobalEnv)
 	state <- unique(state)
 }
 
@@ -13,5 +14,4 @@ dbWriteTable(conn=link$conn, name='state',value=state,
 
 
 assign(x='state', value=state, envir=shared_data)
-assign(x='state.bk', value=state.bk, envir=.GlobalEnv)
 
