@@ -109,6 +109,35 @@ covariate_pipeline <- list(
 											 (status == 'season_break' | status == 'uncaptured')] <- 6
 		cjs_classification[tagged == 1 & surviving == 0 & censored == 1] <- 7
 		return(cjs_classification)
+	},
+	cjs_row_type = function(cjs_classification) {
+		cjs_row_type <- vector(mode='character', length=length(cjs_classification))
+		cjs_row_type[ cjs_classification == 6 ] <- 'ambiguous'
+		cjs_row_type[ cjs_classification != 6 ] <- 'unambiguous'
+		return(cjs_row_type)
+	},
+	antennas_functional = function(stop_date, antennas_start) {
+		antennas_functional <- vector(mode='numeric', length=length(stop_date))
+		antennas_functional[stop_date >= antennas_start] <- 1
+		return(antennas_functional)
+	},
+	interval = function(start_date, stop_date) {
+		interval <- difftime(stop_date, start_date, units='days')
+		return(interval)
+	},
+	pivot_row = function(cohort, stop_date) {
+		pivot_row <- vector(mode='numeric', length=length(stop_date))
+		if (!is.na(cohort)) {
+			center <- ymd(paste0(as.numeric(cohort)+1,'-05-20'))
+		} else {
+			center <- round(length(stop_date)/2)
+		}
+		distances <- as.numeric(stop_date - center)
+		pivot <- which(abs(distances) == min(abs(distances)))
+		pivot_row[1:(pivot-1)] <- 0
+		pivot_row[pivot] <- 1
+		pivot_row[(pivot+1):length(cohort)] <- 2
+		return(pivot_row)
 	}
 )
 
