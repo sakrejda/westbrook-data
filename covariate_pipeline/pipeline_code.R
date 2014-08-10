@@ -127,16 +127,17 @@ covariate_pipeline <- list(
 	},
 	pivot_row = function(cohort, stop_date) {
 		pivot_row <- vector(mode='numeric', length=length(stop_date))
-		if (!is.na(cohort)) {
-			center <- ymd(paste0(as.numeric(cohort)+1,'-05-20'))
+		cohort <- unique(cohort)[!is.na(unique(cohort))]
+		if (length(cohort)==0) {
+			center <- stop_date[round(length(stop_date)/2)]
 		} else {
-			center <- round(length(stop_date)/2)
+			center <- ymd(paste0(as.numeric(cohort[1])+1,'-05-20'))
 		}
 		distances <- as.numeric(stop_date - center)
 		pivot <- which(abs(distances) == min(abs(distances)))
 		pivot_row[1:(pivot-1)] <- 0
 		pivot_row[pivot] <- 1
-		pivot_row[(pivot+1):length(cohort)] <- 2
+		pivot_row[(pivot+1):length(stop_date)] <- 2
 		return(pivot_row)
 	}
 )
