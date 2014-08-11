@@ -139,6 +139,18 @@ covariate_pipeline <- list(
 		pivot_row[pivot] <- 1
 		pivot_row[(pivot+1):length(stop_date)] <- 2
 		return(pivot_row)
+	},
+	season_number = function(age_group) {
+		season_number <- age_group %% 4 + 1
+		return(season_number)
+	},
+	season = function(season_number) {
+		season <- c('spring','summer','autumn','winter')[season_number]
+		return(season)
+	},
+	age_year = function(age_group) {
+		age_year <- age_group %/% 4 + 1
+		return(age_year)
 	}
 )
 
