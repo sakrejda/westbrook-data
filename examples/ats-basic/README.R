@@ -1,12 +1,17 @@
+root <- '~/projekty/westbrook_ats_survival'
+
 do <- list(
-	'.' = c(
+	data_preparation = c(
 		'load_data.R',
 		'covariate_calculations.R',
 		'bind_state_table.R'
 	)
 )
 
-source('shared_data.R', echo=TRUE, verbose=TRUE)
+source(
+	file=file.path(root,'data_preparation','shared_data.R'), 
+	echo=TRUE, verbose=TRUE
+)
 for (stage in names(do)) {
 	for (script in do[[stage]]) {
 		temp <- new.env(parent=shared_data)
@@ -14,7 +19,7 @@ for (stage in names(do)) {
 		with(
 			data=temp,
 			expr= {
-				s <- file.path(stage,script)
+				s <- file.path(root,stage,script)
 				cat(s,"\n")
 				source(file=s, local=TRUE, echo=TRUE, verbose=TRUE)
 			}

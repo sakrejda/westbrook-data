@@ -21,13 +21,6 @@ split_state <- split(x=state, f=state[['tag']], drop=FALSE)
 id_tables <- split(x=id_table, f=id_table[['tag']])
 
 
-## A few modifications:
-
-## Below this size it appears that tagging was not always done---
-## the final decision to tag or not tag was a field judgment.
-deleting_length_measurement <- state[['observed_length']] < 60
-state[['observed_length']][ deleting_length_measurement ] <- NA
-
 ## Dropping rows should happen BEFORE covariate calculations!!
 
 ## Drop extra boundary_detection rows, keeping only the last (for censoring).
