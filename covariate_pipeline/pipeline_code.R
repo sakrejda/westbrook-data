@@ -27,50 +27,123 @@ covariate_pipeline <- list(
 	zst = function(start_date, stop_date, covariate_table) {
 		measurement_dates <- covariate_table[['date_ct']]
 		measurements <- covariate_table[['zst']]
+
+		## Apply to whole set of start_date/stop_date (s).
+		summary <- mapply(
+			FUN=function(start_date, stop_date, measurement_dates, measurements) {
+				## NA's
+				if (is.na(start_date) || is.na(stop_date)) return(as.numeric(NA))
+
+				## Subset:
+				included <- 	
+					measurement_dates >  start_date & 
+					measurement_dates <= stop_date &
+					!is.na(measurements)
+			
+				## Quality check:
+				##measurement_dates <- measurement_dates[included]\
+				days_in_interval <- round(as.numeric(difftime(stop_date, start_date, units='days'))) + 1
+				##days_in_interval <- suppressWarnings(expr={days(round(stop_date - start_date))})
+				days_measured <- sum(included)
+				if ( (days_measured / days_in_interval) < 0.8 ) return(as.numeric(NA))
+			
+				## Reduction:
+				summary <- subset_reduction(included, measurements, mean)
 		
-		## Is covariate defined:
-		if (is.na(start_date) || is.na(stop_date)) return(as.numeric(NA))
-	
-		## Subset:
-		included <- 	
-			measurement_dates >  start_date & 
-			measurement_dates <= stop_date &
-			!is.na(measurements)
-	
-		## Quality check:
-		measurement_dates <- measurement_dates[included]
-		days_in_interval <- suppressWarnings(expr={days(round(stop_date - start_date))})
-		days_measured <- days(sum(included))
-		if ( (days_measured / days_in_interval) < 0.9 ) return(as.numeric(NA))
-	
-		## Reduction:
-		summary <- subset_reduction(included, measurements, mean)
+			},
+			start_date = start_date,
+			stop_date = stop_date,
+			MoreArgs=list(
+				measurement_dates=measurement_dates,
+				measurements=measurements
+			), SIMPLIFY=TRUE
+		)
 		
 		return(summary)	
+	},
+	zst_day = function(detection_date, covariate_table) {
+		## Reduce granularity.
+		measurement_days <- yday(covariate_table[['date_ct']])
+		measurement_years <- year(covariate_table[['date_ct']])
+
+		detection_day <- yday(detection_date)
+		detection_year <- year(detection_date)
+
+		## Find t's
+		measurement <- mapply(
+			FUN=function(day, year, m_days, m_years, m_zst) {
+				measurement_idx <- which(m_days==day & m_years==year)
+				if (length(measurement_idx) == 0)
+					return(as.numeric(NA))
+				else 
+					return(m_zst[measurement_idx][1])
+			}, 
+			day=detection_day, year=detection_year, 
+			MoreArgs=list(m_days=measurement_days, m_years=measurement_years, m_zst = covariate_table[['zst']]),
+			SIMPLIFY=TRUE
+		)
+		return(measurement)	
 	},
 	zsd = function(start_date, stop_date, covariate_table) {
 		measurement_dates <- covariate_table[['date_ct']]
 		measurements <- covariate_table[['zsd']]
+
+		## Apply to whole set of start_date/stop_date (s).
+		summary <- mapply(
+			FUN=function(start_date, stop_date, measurement_dates, measurements) {
+				## NA's
+				if (is.na(start_date) || is.na(stop_date)) return(as.numeric(NA))
+
+				## Subset:
+				included <- 	
+					measurement_dates >  start_date & 
+					measurement_dates <= stop_date &
+					!is.na(measurements)
+			
+				## Quality check:
+				##measurement_dates <- measurement_dates[included]\
+				days_in_interval <- round(as.numeric(difftime(stop_date, start_date, units='days'))) + 1
+				##days_in_interval <- suppressWarnings(expr={days(round(stop_date - start_date))})
+				days_measured <- sum(included)
+				if ( (days_measured / days_in_interval) < 0.8 ) return(as.numeric(NA))
+			
+				## Reduction:
+				summary <- subset_reduction(included, measurements, mean)
 		
-		## Is covariate defined:
-		if (is.na(start_date) || is.na(stop_date)) return(as.numeric(NA))
-	
-		## Subset:
-		included <- 	
-			measurement_dates >  start_date & 
-			measurement_dates <= stop_date &
-			!is.na(measurements)
-	
-		## Quality check:
-		measurement_dates <- measurement_dates[included]
-		days_in_interval <- suppressWarnings(expr={days(round(stop_date - start_date))})
-		days_measured <- days(sum(included))
-		if ( (days_measured / days_in_interval) < 0.9 ) return(as.numeric(NA))
-	
-		## Reduction:
-		summary <- subset_reduction(included, measurements, mean)
+			},
+			start_date = start_date,
+			stop_date = stop_date,
+			MoreArgs=list(
+				measurement_dates=measurement_dates,
+				measurements=measurements
+			), SIMPLIFY=TRUE
+		)
 		
 		return(summary)	
+	},
+	zsd_day = function(detection_date, covariate_table) {
+		## Reduce granularity.
+		measurement_days <- yday(covariate_table[['date_ct']])
+		measurement_years <- year(covariate_table[['date_ct']])
+
+		detection_day <- yday(detection_date)
+		detection_year <- year(detection_date)
+
+		## Find t's
+		measurement <- mapply(
+			FUN=function(day, year, m_days, m_years, m_zsd) {
+				measurement_idx <- which(m_days==day & m_years==year)
+				if (length(measurement_idx) == 0)
+					return(as.numeric(NA))
+				else 
+					return(m_zsd[measurement_idx][1])
+			}, 
+			day=detection_day, year=detection_year, 
+			MoreArgs=list(m_days=measurement_days, m_years=measurement_years, m_zsd = covariate_table[['zsd']]),
+			SIMPLIFY=TRUE
+		)
+
+		return(measurement)	
 	},
 	surviving = function(stop_date, recruit_date, last_detection) {
 		surviving <- rep(0,length(stop_date))

@@ -9,9 +9,25 @@ sampling <- dbGetQuery(link$conn, "SELECT * FROM data_sampling;")
 ## Occasion data:
 occasions <- dbGetQuery(link$conn, "SELECT * FROM data_occasions;")
 
+## Location data:
+location_stmt <- paste(
+	"SELECT",
+	"lower(river) AS river, lower(area) AS area, lower(section) AS section, lower_river_meter, upper_river_meter",
+	"FROM data_locations;")
+locations <- dbGetQuery(link$conn, location_stmt)
+
+
 ## Load state table and sort it---it must be sorted after loading.
 state <- dbGetQuery(link$conn, "SELECT * FROM state_table WHERE species = 'ats';")
+
+# Merge in location data, taking care not to loose rows:
+state.bk <- state
+state <- merge(x=state, y=locations, by=c('river','area','section'), all.x=TRUE, all.y=FALSE)
+if (nrow(state.bk) != nrow(state)) stop() else rm(state.bk)
+
+# Must resort to re-sort after merge.
 state <- state[order(state[['tag']], state[['detection_date']]),]
+
 
 ## Load environmental table:
 edj <- dbGetQuery(link$conn, "SELECT date_ct, zst, zsd  FROM data_environmental_with_zst_zsd")
