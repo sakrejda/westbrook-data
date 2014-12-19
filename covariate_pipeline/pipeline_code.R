@@ -189,6 +189,7 @@ covariate_pipeline <- list(
 		cjs_row_type[ cjs_classification == 6 ] <- 'ambiguous'
 		cjs_row_type[ cjs_classification != 6 ] <- 'unambiguous'
 		cjs_row_type[ cjs_classification == 8 ] <- 'first-capture'
+		cjs_row_type[ cjs_classification == 0 ] <- 'pre-capture'
 		return(cjs_row_type)
 	},
 	antennas_functional = function(stop_date, antennas_start) {
