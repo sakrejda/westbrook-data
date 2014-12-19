@@ -1,13 +1,19 @@
-root <- '~/data_store/westbrook'
-adjusted_data <- file.path(root,'adjusted_data')
-source('~/data_management/generic/data_cleaning_functions.R')
-library(ggplot2)
-library(reshape2)
+## Functions:
+day_to_season <- function(day) {
+  if (day > 66 & day <= 139)
+    return('spring')
+  if (day > 139 & day <= 246)
+    return('summer')
+  if (day > 246 & day <= 334)
+    return('autumn')
+  if (day > 334 | day <=  66)
+    return('winter')
+}
 
 
 ## Data cleaning:
 ed <- read.csv(
-	file = file.path(adjusted_data,'westbrook_core_environmental_data.csv'), 
+	file = file.path(adjusted_data_dir,'westbrook_core_environmental_data.csv'), 
 	stringsAsFactors=FALSE, colClasses='character',check.names=FALSE) 
 names(ed) <- tolower(names(ed))
 
@@ -40,7 +46,9 @@ ed <- ed[order(ed[['date_ct']]),]
 ed[['month']] <- month(ed[['date_ct']])
 ed[['year']] <- year(ed[['date_ct']])
 ed[['day_of_year']] <- yday(ed[['date_ct']])
+ed[['season']] <- sapply(ed[['day_of_year']], day_to_season)
 
+## Save cleaned daily data.
 dbWriteTable(conn=link$conn, name='data_environmental', value=ed,
 						 row.names=FALSE, overwrite=TRUE, append=FALSE)
 
@@ -50,15 +58,15 @@ temperature_average <- data.frame(
 	day_of_year=1:366, 
 	temperature=predict(object=temperature_smooth, newdata=data.frame(day_of_year=1:366))
 )
-temperature_plot <- ggplot(
-	data=ed, 
-	aes(x=day_of_year, y=temperature)
-) + geom_point(size=1/2) + 
-		geom_line(
-			data=temperature_average, 
-			aes(x=day_of_year, y=temperature)
-		) + xlab("Julian Day") + ylab("Temperature (Celsius)")
+temperature_average[['season']] <- sapply(temperature_average[['day_of_year']], day_to_season)
 
+
+## Calculate seasonal mean for temperature and merge:
+temperature_seasonal_mean <- aggregate(formula = temperature ~ season, data=ed, FUN=mean, na.rm=TRUE)
+colnames(temperature_seasonal_mean)[colnames(temperature_seasonal_mean) == 'temperature'] <- 
+	'seasonal_mean_temperature'
+temperature_average <- merge(x=temperature_average, y=temperature_seasonal_mean, by='season')
+temperature_average <- temperature_average[order(temperature_average[['day_of_year']]),]
 
 ## Construct smooth for discharge:
 discharge_smooth <- loess(formula = log10(discharge) ~ day_of_year, data=ed, span =1/4)
@@ -66,76 +74,47 @@ discharge_average <- data.frame(
 	day_of_year=1:366, 
 	discharge=predict(object=discharge_smooth, newdata=data.frame(day_of_year=1:366))
 )
-discharge_plot <- ggplot(
-	data=ed, 
-	aes(x=day_of_year, y=log10(discharge))
-) + geom_point(size=1/2) + 
-		geom_line(
-			data=discharge_average, 
-			aes(x=day_of_year, y=discharge)
-		) + xlab("Julian Day") + ylab("Discharge (Log 10)")
+discharge_average[['season']] <- sapply(discharge_average[['day_of_year']], day_to_season)
 
-## Average environmental data:
+## Calculate seasonal mean for temperature:
+discharge_seasonal_mean <- aggregate(formula = log10(discharge) ~ season, data=ed, FUN=mean, na.rm=TRUE)
+colnames(discharge_seasonal_mean)[colnames(discharge_seasonal_mean) == 'log10(discharge)'] <- 
+	'seasonal_mean_log10_discharge'
+discharge_average <- merge(x=discharge_average, y=discharge_seasonal_mean, by='season')
+discharge_average <- discharge_average[order(discharge_average[['day_of_year']]),]
+
+## Smoothed environmental data:
 average_ed <- data.frame(
 	day_of_year = temperature_average[['day_of_year']], 
 	typical_temperature = temperature_average[['temperature']],
-	typical_log10_discharge=discharge_average[['discharge']]
+	seasonal_mean_temperature = temperature_average[['seasonal_mean_temperature']],
+	typical_log10_discharge=discharge_average[['discharge']],
+	seasonal_mean_discharge = discharge_average[['seasonal_mean_log10_discharge']],
+	season = temperature_average[['season']]
 )
 dbWriteTable(conn=link$conn, name='data_environmental_average',
 						 value=average_ed, row.names=FALSE, overwrite=TRUE, append=FALSE)
 
+
+
+
 # Merge:
 edj <- merge(x=ed, y=average_ed, by='day_of_year')
 edj[['daily_deviation_from_typical_temperature']] <-
-	edj[['temperature']] - edj[['typical_temperature']]
-edj[['ZST']] <- scale(edj[['daily_deviation_from_typical_temperature']])
+  edj[['temperature']] - edj[['typical_temperature']]
+edj[['zst']] <- scale(edj[['daily_deviation_from_typical_temperature']])[,1]
+edj[['daily_deviation_from_seasonal_mean_temperature']] <- 
+	edj[['temperature']] - edj[['seasonal_mean_temperature']]
+edj[['zstm']] <- scale(edj[['daily_deviation_from_seasonal_mean_temperature']])[,1]
 edj[['daily_deviation_from_typical_log10_discharge']] <-
-	log10(edj[['discharge']]) - edj[['typical_log10_discharge']]
-edj[['ZSD']] <- scale(edj[['daily_deviation_from_typical_log10_discharge']])
+  log10(edj[['discharge']]) - edj[['typical_log10_discharge']]
+edj[['zsd']] <- scale(edj[['daily_deviation_from_typical_log10_discharge']])[,1]
+edj[['daily_deviation_from_seasonal_mean_discharge']] <- 
+	log10(edj[['discharge']]) - edj[['seasonal_mean_discharge']]
+edj[['zsdm']] <- scale(edj[['daily_deviation_from_seasonal_mean_discharge']])[,1]
+edj[['season']] <- sapply(edj[['day_of_year']], day_to_season)
+dbWriteTable(conn=link$conn, name='data_environmental_with_zst_zsd', value=edj, overwrite=TRUE, row.names=FALSE)
 
-## Features:
-environmental_covariance_is_seasonal <- ggplot(
-	data=edj, 
-	aes(x=ZST, y=ZSD, colour=factor(month))
-) + geom_point()
-	+ facet_wrap( ~ month)
-
-related_to_seasonal_dynamics <- ggplot(
-	data=edj, 
-	aes(x=day_of_year, y=log10(discharge), colour=factor(month))
-) + geom_point(size=1) + 
-		geom_line(aes(x=day_of_year, y=typical_log10_discharge)) +
-		xlab("Day of Year") + ylab("Discharge (Log 10)")
-
-
-## Comparison:
-comp <- by(
-	data=edj,
-	INDICES=list(month=edj[['month']], year=edj[['year']]),
-	FUN=function(edj) {
-		month <- unique(edj[['month']])
-		year <- unique(edj[['year']])
-		ZSAT <- mean(edj[['temperature']])
-		ZSAD <- mean(log(edj[['discharge']]))
-		ZST <- mean(edj[['ZST']])
-		ZSD <- mean(edj[['ZSD']])
-		return(data.frame(
-			year=rep(year,2),
-			month=rep(month,2), 
-			average = c(ZSAT,ZSAD),
-			seasonal = c(ZST,ZSD),
-			source=c('temperature','discharge')))
-	}
-)
-comp <- do.call(what=rbind, args=comp)
-comp_plot <- ggplot(
-	data=comp, 
-	aes(x=average, y=seasonal, colour=factor(source))
-) + geom_point() + 
-		facet_wrap( ~ month + source, scales='free')
-
-## So the mean used is different but ultimately the relationship is
-## linear-ish. Woohoo!
 
 
 

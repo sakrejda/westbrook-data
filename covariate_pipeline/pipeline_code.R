@@ -181,12 +181,14 @@ covariate_pipeline <- list(
 		cjs_classification[tagged == 1 & surviving == 0 & censored == 0 & 
 											 (status == 'season_break' | status == 'uncaptured')] <- 6
 		cjs_classification[tagged == 1 & surviving == 0 & censored == 1] <- 7
+		cjs_classification[tagged == 0 & status == 'recaptured'] <- 8
 		return(cjs_classification)
 	},
 	cjs_row_type = function(cjs_classification) {
 		cjs_row_type <- vector(mode='character', length=length(cjs_classification))
 		cjs_row_type[ cjs_classification == 6 ] <- 'ambiguous'
 		cjs_row_type[ cjs_classification != 6 ] <- 'unambiguous'
+		cjs_row_type[ cjs_classification == 8 ] <- 'first-capture'
 		return(cjs_row_type)
 	},
 	antennas_functional = function(stop_date, antennas_start) {
