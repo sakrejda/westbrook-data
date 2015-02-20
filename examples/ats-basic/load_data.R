@@ -30,12 +30,16 @@ state <- state[order(state[['tag']], state[['detection_date']]),]
 
 
 ## Load environmental table:
-edj <- dbGetQuery(link$conn, "SELECT date_ct, zst, zsd  FROM data_environmental_with_zst_zsd")
+edj <- dbGetQuery(link$conn, "SELECT date_ct, zst, zsd, daily_log10_discharge FROM data_environmental_with_zst_zsd")
 
 ## Sometimes we use splits
 split_state <- split(x=state, f=state[['tag']], drop=FALSE)
 id_tables <- split(x=id_table, f=id_table[['tag']])
-
+ 
+## Below this size it appears that tagging was not always done---
+## the final decision to tag or not tag was a field judgment.
+deleting_length_measurement <- state[['observed_length']] < 60
+state[['observed_length']][ deleting_length_measurement ] <- NA
 
 ## Dropping rows should happen BEFORE covariate calculations!!
 
@@ -54,7 +58,8 @@ split_state <- mclapply(
 	mc.cores=getOption('mc.cores',6L)
 )
 
-state <- do.call(what=rbind, args=split_state)
+#state <- do.call(what=rbind, args=split_state)
+state <- batch_rbind(split_state)
 
 
 ## Make data globally available in shared_data.

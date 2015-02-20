@@ -1,4 +1,7 @@
-state <- do.call(what=rbind, args=split_state)
+#state <- do.call(what=rbind, args=split_state)
+
+state <- batch_rbind(split_state)
+
 rownames(state) <- 1:nrow(state)
 
 

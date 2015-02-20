@@ -9,7 +9,8 @@ do <- list(
 		"form_table_samples.R",
 		"calculate_season_breaks.R",
 		"form_table_season_map.R",
-		"form_table_tags.R"
+		"form_table_tags.R",
+		"form_table_temperature_discharge.R"
 	),
 	
 	data_table_stage = c(

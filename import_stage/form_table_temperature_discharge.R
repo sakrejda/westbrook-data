@@ -106,6 +106,7 @@ edj[['zst']] <- scale(edj[['daily_deviation_from_typical_temperature']])[,1]
 edj[['daily_deviation_from_seasonal_mean_temperature']] <- 
 	edj[['temperature']] - edj[['seasonal_mean_temperature']]
 edj[['zstm']] <- scale(edj[['daily_deviation_from_seasonal_mean_temperature']])[,1]
+edj[['daily_log10_discharge']] <- log10(edj[['discharge']])
 edj[['daily_deviation_from_typical_log10_discharge']] <-
   log10(edj[['discharge']]) - edj[['typical_log10_discharge']]
 edj[['zsd']] <- scale(edj[['daily_deviation_from_typical_log10_discharge']])[,1]

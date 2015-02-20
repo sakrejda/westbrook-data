@@ -145,6 +145,32 @@ covariate_pipeline <- list(
 
 		return(measurement)	
 	},
+	log10_discharge_day = function(detection_date, covariate_table) {
+		## Reduce granularity.
+		measurement_days <- yday(covariate_table[['date_ct']])
+		measurement_years <- year(covariate_table[['date_ct']])
+
+		detection_day <- yday(detection_date)
+		detection_year <- year(detection_date)
+
+		## Find t's
+		measurement <- mapply(
+			FUN=function(day, year, m_days, m_years, m_daily_log10_discharge) {
+				measurement_idx <- which(m_days==day & m_years==year)
+				if (length(measurement_idx) == 0)
+					return(as.numeric(NA))
+				else 
+					return(m_daily_log10_discharge[measurement_idx][1])
+			}, 
+			day=detection_day, year=detection_year, 
+			MoreArgs=list(
+				m_days=measurement_days, 
+				m_years=measurement_years, 
+				m_daily_log10_discharge = covariate_table[['daily_log10_discharge']]),
+			SIMPLIFY=TRUE
+		)
+		return(measurement)	
+	},
 	surviving = function(stop_date, recruit_date, last_detection) {
 		surviving <- rep(0,length(stop_date))
 		known_surviving <-
@@ -224,9 +250,20 @@ covariate_pipeline <- list(
 		season <- c('spring','summer','autumn','winter')[season_number]
 		return(season)
 	},
+	smolt_season = function(season_number, cjs_classification) {
+		smolt_season <- season_number
+		smolt_season[cjs_classification == 4] <- 1
+		return(smolt_season)
+	},
 	age_year = function(age_group) {
 		age_year <- age_group %/% 4 + 1
 		return(age_year)
+	},
+	observed_growth = function(observed_length, tag) {
+		observed_growth <- c(NA,diff(observed_length))
+		first_tag_row <- tag %>% factor %>% as.numeric %>% diff %>% c(1,.)
+		observed_growth[first_tag_row] <- NA
+		return(observed_growth)
 	}
 )
 
