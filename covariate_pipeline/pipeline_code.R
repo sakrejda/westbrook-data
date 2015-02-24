@@ -255,8 +255,12 @@ covariate_pipeline <- list(
 		smolt_season[cjs_classification == 4] <- 1
 		return(smolt_season)
 	},
-	age_year = function(age_group) {
-		age_year <- age_group %/% 4 + 1
+	age_year_group = function(age_group) {
+		age_year_group <- age_group %/% 4 - 1
+		return(age_year_group)
+	},
+	age_year = function(age_year_group) {
+		age_year <-  paste0((age_year_group),'+')
 		return(age_year)
 	},
 	observed_growth = function(observed_length, tag) {
