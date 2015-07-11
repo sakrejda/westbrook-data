@@ -16,8 +16,14 @@ covariate_pipeline <- list(
 	},
 	start_date = function(detection_date) {
 		l <- length(detection_date)
-		date <- c(ymd_hms(NA),detection_date[1:(l-1)])
-		return(date)
+    na_date <- NA
+    class(na_date) <- c('POSIXct','POSIXt')
+    if (l == 1) 
+      return(na_date)
+    else {
+  		date <- c(na_date,detection_date[1:(l-1)])
+	  	return(date)
+    }
 	},
 	stop_date = function(detection_date) {
 		l <- length(detection_date)
@@ -182,7 +188,8 @@ covariate_pipeline <- list(
 	tagged = function(status) {
 		tagged <- vector(mode='numeric', length=length(status))
 		first <- min(which(status == 'recaptured'))
-		tagged[(first+1):length(tagged)] <- 1
+    if (length(status) > 1)
+    	tagged[(first+1):length(tagged)] <- 1
 		return(tagged)
 	},
 	censored = function(status) {
@@ -193,6 +200,8 @@ covariate_pipeline <- list(
 			return(censored)
 		} else {
 			last <- max(which(status %in% c('trap_recapture','boundary_detection')))
+      if (last == length(status))
+        return(1)
 			censored[(last+1):length(censored)] <- 1
 		}
 		return(censored)
@@ -228,6 +237,7 @@ covariate_pipeline <- list(
 		return(interval)
 	},
 	pivot_row = function(cohort, stop_date) {
+    if (length(cohort)==1) return(1)
 		pivot_row <- vector(mode='numeric', length=length(stop_date))
 		cohort <- unique(cohort)[!is.na(unique(cohort))]
 		if (length(cohort)==0) {
@@ -264,11 +274,21 @@ covariate_pipeline <- list(
 		return(age_year)
 	},
 	observed_growth = function(observed_length, tag) {
+    if (length(observed_length) == 1)
+      return(NA)
 		observed_growth <- c(NA,diff(observed_length))
 		first_tag_row <- tag %>% factor %>% as.numeric %>% diff %>% c(1,.)
 		observed_growth[first_tag_row] <- NA
 		return(observed_growth)
-	}
+	},
+  first_ambiguous = function(status, cjs_row_type, detection_date) {
+    first_ambiguous <- vector(mode='numeric', length=length(cjs_row_type))
+    date_cutoff <- max(detection_date[cjs_row_type != 'ambiguous']) + days(273)
+    wh <- which((status == 'season_break') & (cjs_row_type=='ambiguous') & (detection_date > date_cutoff))
+    if (length(wh) != 0)
+      first_ambiguous[min(wh)] <- 1
+    return(first_ambiguous)
+  }
 )
 
 
